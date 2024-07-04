@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Cleaner</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+    </style>
+    <script>
+        function selectAllFiles(source) {
+            checkboxes = document.getElementsByName('delete');
+            for(var i in checkboxes) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center">File Cleaner</h1>
+    <form method="post" class="mb-4">
+        <div class="form-group">
+            <label for="directory">Add Directory:</label>
+            <input type="text" class="form-control" id="directory" name="directory">
+            <button type="submit" class="btn btn-primary mt-2">Add Directory</button>
+        </div>
+    </form>
+    {% if directories %}
+    <h2 class="text-center">Configured Directories</h2>
+    <ul class="list-group mb-4">
+        {% for dir in directories %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ dir }}
+            <form action="{{ url_for('delete_directory', directory=dir) }}" method="post" class="mb-0">
+                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+    <form method="post" class="mb-4">
+        <div class="form-group">
+            <label for="days">Files older than (days):</label>
+            <input type="number" class="form-control" id="days" name="days" value="{{days}}" min="1" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Scan</button>
+    </form>
+    {% endif %}
+    {% if files %}
+    <h2 class="text-center">Files older than {{days}} days</h2>
+    <form method="post">
+        <input type="hidden" name="days" value="{{days}}">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="selectAll" onclick="selectAllFiles(this)">
+            <label class="form-check-label" for="selectAll">Select All</label>
+        </div>
+        <ul class="list-group mt-3">
+            {% for file in files %}
+            <li class="list-group-item">
+                <input type="checkbox" name="delete" value="{{file.name}}">
+                {{file.name}} (Last modified: {{file.mod_time}})
+            </li>
+            {% endfor %}
+        </ul>
+        <button type="submit" class="btn btn-danger mt-3">Delete Selected Files</button>
+    </form>
+    {% endif %}
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
